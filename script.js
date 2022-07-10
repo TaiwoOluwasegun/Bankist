@@ -80,6 +80,15 @@ const displayMovements = function (movements){
 
 displayMovements(account1.movements);
 
+// balance calculation
+
+const calcDisplayBalance = function(movements){
+    const balance = movements.reduce((acc,mov)=>
+        acc + mov
+    )
+    labelBalance.textContent = `${balance} EUR`
+}
+calcDisplayBalance(account1.movements)
 // create innitials for log in
 
 const createUsernames = function(accs){
