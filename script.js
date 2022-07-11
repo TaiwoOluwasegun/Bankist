@@ -61,11 +61,13 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
-const displayMovements = function (movements){
+const displayMovements = function (movements, sort = false){
     // empty list conntainer
 
     containerMovements.innerHTML = ''
-    movements.forEach((mov,i) =>{
+ const movs = sort ? movements.slice().sort((a,b)=> a-b) : movements
+
+    movs.forEach((mov,i) =>{
         const type = mov > 0 ? 'deposit' : 'withdrawal';
         const html = `
     <div class="movements__row">
@@ -164,7 +166,9 @@ btnTransfer.addEventListener('click', (e)=>{
     const recieverAcc = accounts.find(
         acc=>acc.username === inputTransferTo.value
     );
-    console.log(amount, recieverAcc);
+    // console.log(amount, recieverAcc);
+    inputTransferAmount.value = '';
+    inputTransferTo.value= '';
     if(amount > 0 && recieverAcc && 
         currentAccount.balance >= amount &&
         recieverAcc?.username !==currentAccount.username
@@ -178,6 +182,42 @@ btnTransfer.addEventListener('click', (e)=>{
         }
 })
 
+// loann functionality
+btnLoan.addEventListener('click', function(e){
+    e.preventDefault();
+    const amount = Number(inputLoanAmount.value);
+    if (amount > 0 && currentAccount.movements.some(
+        mov => mov >= amount*0.1
+    )){
+        currentAccount.movements.push(amount);
+
+        // update ui
+        updateUI(currentAccount);
+        inputLoanAmount.value = '';
+    }
+})
+
+
+btnClose.addEventListener('click', function(e){
+    e.preventDefault();
+    if(inputCloseUsername.value === currentAccount.username && Number(inputClosePin.value)=== currentAccount.pin){
+        const index = accounts.findIndex(acc => acc.username === currentAccount.username);
+
+        // delete account
+        accounts.splice(index, 1);
+
+        // hide UI
+        containerApp.style.opacity = 0;
+    }
+})
+
+// sort btn
+let sorted = false;
+btnSort.addEventListener('click', function(e){
+    e.preventDefault();
+    displayMovements(currentAccount.movements, !sorted)
+    sorted = !sorted;
+})
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 // LECTURES
